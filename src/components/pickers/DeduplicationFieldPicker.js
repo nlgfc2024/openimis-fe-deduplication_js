@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useTranslations, Autocomplete } from '@openimis/fe-core';
-import { BASIC_FIELDS } from '../../constants';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslations, Autocomplete } from "@openimis/fe-core";
+import { fetchIndividualBasicFields } from "../../actions";
 
 function DeduplicationFieldPicker({
   readOnly,
@@ -16,20 +17,37 @@ function DeduplicationFieldPicker({
   filterOptions,
   filterSelectedOptions,
 }) {
+  const dispatch = useDispatch();
+  const individualBasicFields = useSelector(
+    (state) => state.deduplication.individualBasicFields ?? [],
+  );
+  const fetchingIndividualBasicFields = useSelector(
+    (state) => state.deduplication.fetchingIndividualBasicFields,
+  );
+
+  useEffect(() => {
+    if (!fetchingIndividualBasicFields && individualBasicFields.length === 0) {
+      dispatch(fetchIndividualBasicFields());
+    }
+  }, [dispatch, fetchingIndividualBasicFields, individualBasicFields.length]);
+
   const [searchString, setSearchString] = useState();
-  const { formatMessage } = useTranslations('deduplication');
+  const { formatMessage } = useTranslations("deduplication");
 
   const beneficiaryDataSchema = JSON.parse(benefitPlan?.beneficiaryDataSchema);
   const schemaFields = Object.keys(beneficiaryDataSchema?.properties ?? {});
   const schemaFieldsList = schemaFields.map((key) => ({ id: key, name: key }));
-  const possibleFields = [...schemaFieldsList, ...BASIC_FIELDS];
+  const possibleFields = [...schemaFieldsList, ...individualBasicFields];
 
   return (
     <Autocomplete
       multiple={multiple}
       required={required}
-      placeholder={placeholder ?? formatMessage('deduplication.deduplicate.fields.placeholder')}
-      label={label ?? formatMessage('deduplication.deduplicate.fields')}
+      placeholder={
+        placeholder ??
+        formatMessage("deduplication.deduplicate.fields.placeholder")
+      }
+      label={label ?? formatMessage("deduplication.deduplicate.fields")}
       error={[]}
       withLabel={withLabel}
       withPlaceholder={withPlaceholder}
