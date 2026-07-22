@@ -73,7 +73,7 @@ function BeneficiaryDuplicatesTable({
     };
     setFieldValues(parsedFieldValues);
     // eslint-disable-next-line max-len
-    const additionalDataString = String.raw`{\"values\": ${JSON.stringify(additionalData.values).replace(/"/g, '\\"')},\"beneficiaryIds\": ${JSON.stringify(additionalData.beneficiaryIds).replace(/"/g, '\\"')}}`;
+    const additionalDataString = `{\\"values\\": ${JSON.stringify(additionalData.values).replace(/"/g, '\\"')},\\"beneficiaryIds\\": ${JSON.stringify(additionalData.beneficiaryIds).replace(/"/g, '\\"')}}`;
     setAdditionalData(additionalDataString);
   }, [selectedCells, dontMergeRows]);
   const isCellSelected = (rowIndex, header) =>
@@ -90,7 +90,7 @@ function BeneficiaryDuplicatesTable({
 
   const clearRowSelection = (rowIndex) => {
     const restCells = selectedCells.filter(
-      (cell) => cell.rowIndex !== rowIndex,
+      (cell) => !(cell.rowIndex === rowIndex),
     );
     setSelectedCells(restCells);
   };
@@ -180,7 +180,7 @@ function BeneficiaryDuplicatesTable({
 
   useEffect(() => {
     if (completedData) {
-      const numberOfRows = Array.from(new Array(rows.length).keys());
+      const numberOfRows = Array.from(Array(rows.length).keys());
       clearAllCellSelection();
       setDontMergeRows(numberOfRows);
     }
