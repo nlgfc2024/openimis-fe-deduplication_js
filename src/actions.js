@@ -17,9 +17,7 @@ export function fetchDeduplicationSummary(params) {
 }
 
 export function fetchIndividualBasicFields() {
-  const payload = formatQuery("individualBasicFields", {}, [
-    "individualBasicFields",
-  ]);
+  const payload = formatQuery("individualBasicFields", {}, null);
   return graphql(payload, ACTION_TYPE.GET_INDIVIDUAL_BASIC_FIELDS);
 }
 
