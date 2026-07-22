@@ -1,18 +1,14 @@
 // Disabled due to consistency with other modules
 /* eslint-disable default-param-last */
 
-import {
-  formatServerError,
-  dispatchMutationResp,
-} from '@openimis/fe-core';
-import {
-  ERROR, REQUEST, SUCCESS,
-} from './util/action-type';
+import { formatServerError, dispatchMutationResp } from "@openimis/fe-core";
+import { ERROR, REQUEST, SUCCESS } from "./util/action-type";
 
 export const ACTION_TYPE = {
-  MUTATION: 'MUTATION',
-  GET_DEDUPLICATION_SUMMARY: 'DEDUPLICATION_GET_DEDUPLICATION_SUMMARY',
-  CREATE_DEDUPLICATION_TASKS: 'CREATE_DEDUPLICATION_TASKS',
+  MUTATION: "MUTATION",
+  GET_DEDUPLICATION_SUMMARY: "DEDUPLICATION_GET_DEDUPLICATION_SUMMARY",
+  CREATE_DEDUPLICATION_TASKS: "CREATE_DEDUPLICATION_TASKS",
+  GET_INDIVIDUAL_BASIC_FIELDS: "GET_INDIVIDUAL_BASIC_FIELDS",
 };
 
 function reducer(
@@ -23,6 +19,10 @@ function reducer(
     errorSummary: null,
     fetchedSummary: false,
     summary: [],
+    fetchingIndividualBasicFields: false,
+    errorIndividualBasicFields: null,
+    fetchedIndividualBasicFields: false,
+    individualBasicFields: [],
   },
   action,
 ) {
@@ -39,9 +39,11 @@ function reducer(
         ...state,
         fetchingSummary: false,
         fetchedSummary: true,
-        summary: action.payload.data.beneficiaryDeduplicationSummary.rows?.map((row) => ({
-          ...row,
-        })),
+        summary: action.payload.data.beneficiaryDeduplicationSummary.rows?.map(
+          (row) => ({
+            ...row,
+          }),
+        ),
         errorSummary: null,
       };
     case ERROR(ACTION_TYPE.GET_DEDUPLICATION_SUMMARY):
@@ -51,7 +53,34 @@ function reducer(
         errorSummary: formatServerError(action.payload),
       };
     case SUCCESS(ACTION_TYPE.CREATE_DEDUPLICATION_TASKS):
-      return dispatchMutationResp(state, 'createDeduplicationTasks', action);
+      return dispatchMutationResp(state, "createDeduplicationTasks", action);
+
+    case REQUEST(ACTION_TYPE.GET_INDIVIDUAL_BASIC_FIELDS):
+      return {
+        ...state,
+        fetchingIndividualBasicFields: true,
+        fetchedIndividualBasicFields: false,
+        individualBasicFields: [],
+      };
+    case SUCCESS(ACTION_TYPE.GET_INDIVIDUAL_BASIC_FIELDS):
+      return {
+        ...state,
+        fetchingIndividualBasicFields: false,
+        fetchedIndividualBasicFields: true,
+        individualBasicFields:
+          action.payload.data.individualBasicFields?.map((field) => ({
+            id: field,
+            name: field,
+          })) ?? [],
+        errorIndividualBasicFields: null,
+      };
+    case ERROR(ACTION_TYPE.GET_INDIVIDUAL_BASIC_FIELDS):
+      return {
+        ...state,
+        fetchingIndividualBasicFields: false,
+        errorIndividualBasicFields: formatServerError(action.payload),
+      };
+
     default:
       return state;
   }
