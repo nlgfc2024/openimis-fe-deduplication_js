@@ -180,7 +180,7 @@ function BeneficiaryDuplicatesTable({
 
   useEffect(() => {
     if (completedData) {
-      const numberOfRows = Array.from(Array(rows.length).keys());
+      const numberOfRows = Array.from(new Array(rows.length).keys());
       clearAllCellSelection();
       setDontMergeRows(numberOfRows);
     }
